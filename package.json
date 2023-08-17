@@ -1,5 +1,5 @@
 {
-  "name": "booking-analytics",
+  "name": "evolane-entity-explorer",
   "version": "0.0.0",
   "description": "An empty project",
   "scripts": {
@@ -19,25 +19,30 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@dynatrace/strato-components-preview": "0.98.0",
-    "@dynatrace-sdk/client-query": "1.2.0",
-    "@dynatrace-sdk/navigation": "1.0.0",
-    "@dynatrace-sdk/user-preferences": "1.0.0",
-    "@dynatrace-sdk/app-environment": "1.0.0",
-    "@dynatrace-sdk/error-handlers": "1.1.0",
+    "@dynatrace-sdk/app-environment": "1.0.1",
+    "@dynatrace-sdk/client-classic-environment-v2": "^1.2.3",
+    "@dynatrace-sdk/client-query": "1.3.0",
+    "@dynatrace-sdk/error-handlers": "1.1.1",
+    "@dynatrace-sdk/navigation": "1.0.1",
+    "@dynatrace-sdk/user-preferences": "1.0.1",
+    "@dynatrace/strato-components-preview": "0.100.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
+    "react-intl": "6.0.8",
     "react-router-dom": "^6.4.1"
   },
   "devDependencies": {
-    "dt-app": "0.102.2",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^13.1.8",
     "@types/node": "^16.11.34",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
+    "dt-app": "0.102.2",
     "eslint": "^8.15.0",
     "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.5.0"
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "react-is": "^17.0.2"
   }
 }

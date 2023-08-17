@@ -1,13 +1,13 @@
 import type { CliOptions } from 'dt-app';
 
 const config: CliOptions = {
-  environmentUrl: 'https://dzc35632.live.dynatrace.com/',
+  environmentUrl: 'https://dzc35632.apps.dynatrace.com',
   app: {
-    name: 'booking-analytics',
+    name: 'evolane-entity-explorer',
     version: '0.0.0',
     description: 'An empty project',
-    id: 'my.booking.analytics',
-    scopes: [{ name: 'storage:logs:read', comment: 'default template' }, { name: 'storage:buckets:read', comment: 'default template' }]
+    id: 'eu.evolane.entityexplorer',
+    scopes: [{name: 'environment-api:entities:read', comment:'test'},{name: 'environment-api:metrics:read', comment: 'test'},{ name: 'storage:logs:read', comment: 'default template' }, { name: 'storage:buckets:read', comment: 'default template' }]
   },
 };
 
