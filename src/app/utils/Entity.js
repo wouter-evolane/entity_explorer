@@ -1,4 +1,5 @@
 import { monitoredEntitiesClient } from "@dynatrace-sdk/client-classic-environment-v2";
+var _ = require('lodash');
 
 //https://www.bennadel.com/blog/3201-exploring-recursive-promises-in-javascript.htm
 function nextPage( previousPage, collectedResults = [] ) {
@@ -21,9 +22,14 @@ export function getAllEntityTypes(){
     )
     .then( 
         function(resultData) {
-            return resultData
+            let a =_.uniq(resultData);
+            return _.uniq(resultData);
 
         }
     )
 ;
+}
+export function getEntitiesList(selector,date){
+return new Promise (() =>console.log('entitieslist'))
+
 }
