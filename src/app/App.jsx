@@ -1,38 +1,34 @@
 import React from "react";
 import { useState } from 'react';
-import { AppHeader,TimeframeSelector,Button, AppName, Page, Flex, Code, Heading, Paragraph, FormField, Select,SelectOption, DatePicker } from "@dynatrace/strato-components-preview";
-import {getAllEntityTypes} from "./utils/Entity"
-import { metricsClient } from "@dynatrace-sdk/client-classic-environment-v2";
+import { AppHeader, TimeframeSelector, Button, AppName, Page, Flex, Code, Heading, Paragraph, FormField, SelectV2, DatePicker } from "@dynatrace/strato-components-preview";
+import { getAllEntityTypes } from "./utils/Entity"
 import {
-  QueryClient,
-  QueryClientProvider,
   useQuery,
   useQueryClient
 } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import EntityList from "./components/EntityList";
 
 var _ = require('lodash');
 
 export const App = () => {
   const queryClient = useQueryClient()
-  let selected = null
-  const { isLoading, isError, data, error } = useQuery({ queryKey: ['todos'], queryFn: getAllEntityTypes })
+  const [entityTypes, SetEntityTypes] = useState();
+
+  const { isLoading, isError, data, error } = useQuery({ queryKey: ['entityTypes'], queryFn: getAllEntityTypes })
   const [timeFrame, setTimeFrame] = useState(null);
-  const [selectedType,setSelectedType] = useState(null);
-  const [entitySelector,setEntitySelector] = useState(null)
-  var submitEntity = (evt) => {
+  const [selector, setSelector] = useState('type("dt.entity.host")');
+  const [selectedType, setSelectedType] = useState('type("dt.entity.host")');
+  const [selectedEntity, setSelectedEntity] = useState(null);
+
+  var submitEntityType = (evt) => {
+    console.log(evt)
     setSelectedType(evt)
 
   };
-  var updateTimeFrame = (evt)=>{
+  var updateTimeFrame = (evt) => {
     setTimeFrame(evt)
     console.log(evt);
   }
-  var clickGetEnitities = (evt) => {
-    console.log(selectedType)
-    console.log(timeFrame)
-
-  };
   //debugger
   if (isLoading) {
     return <span>Retrieving EntityTypes...</span>
@@ -41,8 +37,12 @@ export const App = () => {
   if (isError) {
     return <span>Error: {error.message}</span>
   }
+
+
+
+ 
   return (
-    
+
     <Page>
       <Page.Header>
         <AppHeader>
@@ -52,29 +52,30 @@ export const App = () => {
       <Page.Main>
         <Flex padding={16} flexDirection="column">
 
+          <EntityList selectedId={selector}  />
 
-        <entityDisplay />
-        
-        
+
+
           <div>
           </div>
         </Flex>
+
+
+
       </Page.Main>
+      <Page.DetailView><EntityList entityDetail={selectedEntity} onSelectEntity={setSelectedEntity}/></Page.DetailView>
       <Page.Sidebar>
-      <FormField label="Select an entity">
-<Select name="entitytype"        selectedId={selectedType} onChange={submitEntity} hasFilter>
-  {console.log(data)}
-  { data.map((object, index) =>   <SelectOption id={object.dimensionKey }> {object.dimensionKey} </SelectOption> )}
-</Select>
-<TimeframeSelector value={timeFrame} onChange={(evt) =>updateTimeFrame(evt)} />
-<Button color="neutral" variant="accent" onClick={clickGetEnitities}>Get Entities</Button>
-
-
-
-
-</FormField>
-        
+        <FormField label="Select an entity">
+          <SelectV2 name="entitytype" selectedId={selectedType} onChange={submitEntityType}>
+            <SelectV2.Content>
+              {data.map((object, index) => <SelectV2.Option key={object.dimensionKey + index} value={object.dimensionKey}> {object.displayName} </SelectV2.Option>)}
+            </SelectV2.Content>
+          </SelectV2>
+          <TimeframeSelector value={timeFrame} onChange={(evt) => updateTimeFrame(evt)} />
+          <Button color="neutral" variant="accent" onClick={(evt) =>clickGetEnitities(evt)}>Get Entities</Button>
+        </FormField>
       </Page.Sidebar>
+
     </Page>
   );
 };
