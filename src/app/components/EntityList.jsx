@@ -1,21 +1,17 @@
+"use strict";
 import React, { useMemo } from 'react';
 
 import { useState } from 'react';
-import { ZoomInIcon, ActionIcon } from '@dynatrace/strato-icons';
-import { DataTable , TableUserActions} from '@dynatrace/strato-components-preview/tables';
-import { getEntitiesList, getEntities } from "../utils/Entity"
-import {
-
-  Flex,
-
-  Surface,
-
-} from '@dynatrace/strato-components-preview/layouts-core';
-
+import { Button } from '@dynatrace/strato-components-preview/buttons';
+import { DataTable } from '@dynatrace/strato-components-preview/tables';
+import { getEntities, getEntity } from "../utils/Entity"
+import { Skeleton, Flex } from '@dynatrace/strato-components-preview/layouts-core';
 import {
   useQuery,
   useQueryClient
 } from '@tanstack/react-query'
+import MetricDetailModal from './MetricDetail';
+
 
 
 const sampleColumns = [
@@ -37,36 +33,64 @@ const sampleColumns = [
 ];
 
 
-
-const sampleData = [
-
-
-
-];
-
-export default EntityList = (selectedType, onSelectEntity) => {
-
-  const columns = useMemo(() => sampleColumns, []);
+EntityListExpanded = ({ row, expandedRows, table }) => {
 
   const queryClient = useQueryClient()
-  const [entities, setEntities] = useState();
-  const [selectedRows, setSelectedRows] = useState(null);
-  const myRowSelectionChangedListener = (selectedRows, selectedRowsData, trigger) => {
-    debugger
-    console.log('row selection obj', selectedRows);
-    console.log('row selection data', selectedRowsData);
-    console.log('trigger', trigger);
-    setSelectedRows(selectedRows);
-  };
+  console.log(row["entityId"])
+
+  if (expandedRows[row] === true)
+    return (
+      <Flex flexDirection="column">
+        <Skeleton width="100%" height="40px" />
+      </Flex>
+    )
+  else {
+
+    const { isLoading, isError, data, error } = useQuery({ queryKey: ['entity' + row["entityId"]], queryFn: () => getEntity(row["entityId"]) })
+    if (data) {
+      console.log(data)
+      const rows = [];
+      for (const property in data) {
+        if (typeof (data[property]) === "string") {
+          rows.push(<p>{property}:{data[property]}</p>)
+
+        }
+      }
+      rows.push()
+      return rows
+
+
+    } else {
+      return (<Flex flexDirection="column">
+        <Skeleton width="100%" height="40px" />
+      </Flex>)
+    }
+  }
+
+}
+
+
+export default EntityList = ({ selectedType, onSelectEntity, metricIndex }) => {
+
+  const columns = useMemo(() => sampleColumns, []);
+  const [expandedRows, setExpandedRows] = useState({})
+  const [EntityDetail, setEntityDetail] = useState(null)
+  const [MetricDetail, setMetricDetail] = useState(null)
 
 
 
 
-  if (selectedType.selectedId === null) {
-    return <span>Select an entity type on the left</span>
+  function onExpandedRowsChange(expandedRows) {
+    console.log('Currently expanded:', expandedRows);
+    setExpandedRows(expandedRows)
+  }
+
+
+  if (selectedType === false) {
+    return <span>Select an entity type</span>
 
   } else {
-    const { isLoading, isError, data, error } = useQuery({ queryKey: ['entities'], queryFn: () => getEntities(selectedType) })
+    const { isLoading, isError, data, error } = useQuery({ queryKey: ['list' + [selectedType]], queryFn: () => getEntities('type("' + selectedType + '")') })
 
     if (isLoading) {
       return <span>Retrieving Entities...</span>
@@ -75,39 +99,51 @@ export default EntityList = (selectedType, onSelectEntity) => {
     if (isError) {
       return <span>Error: {error.message}</span>
     }
-    debugger
-    return <DataTable columns={columns} data={data}>
+    if (data) {
+
+      return (
 
 
-      <DataTable.Toolbar>
+        <section>
 
-        <DataTable.DownloadData />
 
-      </DataTable.Toolbar>
-      <DataTable.UserActions>
-     <DataTable.CellActions>
-            {({ cell }) => (
-              <TableUserActions>
-                <TableUserActions.Item
+          {MetricDetail && <MetricDetailModal entity={MetricDetail} setVisible={setMetricDetail} metrics={metricIndex} />}
 
-onSelect={() => {
 
-  /* trigger custom action */
 
-  console.log(`CLICK`);
 
-}}
 
->
-                  <TableUserActions.ItemIcon  >
-                    <ActionIcon/>
-                  </TableUserActions.ItemIcon>
-                  </TableUserActions.Item>
-              </TableUserActions>
-            )}
-          </DataTable.CellActions>
-      </DataTable.UserActions>
-    </DataTable>;
+          <DataTable columns={columns} expandedRows={expandedRows} data={data} onExpandedRowsChange={(rows) => onExpandedRowsChange(rows)}>
+            <DataTable.Toolbar>
+
+              <DataTable.DownloadData />
+
+            </DataTable.Toolbar>
+            <DataTable.UserActions>
+              <DataTable.RowActions>
+                {
+
+
+                  (row) => (
+                    <Button onClick={(e) => {
+                      setMetricDetail(row.data[row.currentRowIndex])
+                    }} >
+                      show metrics</Button>
+                  )}
+              </DataTable.RowActions>
+            </DataTable.UserActions>
+            <DataTable.ExpandableRow>
+              {({ row }) => {
+                var returnvalue = <EntityListExpanded row={row} table={data} expandedRows={expandedRows} />;
+                return returnvalue
+
+              }}
+            </DataTable.ExpandableRow>
+          </DataTable>
+        </section>);
+
+    }
+
 
   }
 
